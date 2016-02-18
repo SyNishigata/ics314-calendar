@@ -1,0 +1,24 @@
+The first team deliverable is worth 3 points and is due in Week 7.  <-- 2/22 - 2/28
+Teams will have short (5-10 minute) meetings with the TA where you will
+demonstrate that:  ***I don't know if we have to make this appointment -Sy
+
+
+• your team has registered your project on github  CHECK
+
+• everyone in the group has used a calendaring system of their choice to create
+a .ics event file and has looked at the content of that file with a text editor
+such (such as vim or textedit). “Reverse engineering” .ics files can offer
+significant insight.
+
+• your team has functioning code, no matter how minimal: You must
+demonstrate code that generates a .ics file for a simple, single occurrence
+event such as: Study for exam, 1pm-2pm HST, 12 May 2016, in Hamilton
+Library. You must then demonstrate that the calendar program of your
+choice (say, google calendar) successfully reads and processes the .ics files
+you generate. The code could be a simple as print statements, but for that
+single event, but it must generate an .ics file that is readable by a calendar
+project.
+
+• In the real-world, your code would be embedded in a larger calendaring
+system, so don’t worry much about a user interface. In fact, to create .ics
+files your user interface can be command line or simple drop-down menus.
