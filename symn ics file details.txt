@@ -1,0 +1,17 @@
+My event details:
+Title: Study for ICS 314
+DateTime: 2/22/2016 12:00pm to 2:00pm 2/22/16
+UNCHECKED All day  UNCHECKED Repeat...
+
+Where: University of Hawaii at Manoa, 2500 Campus Rd, Honolulu, HI 96822, United States
+Video Call: None
+Calendar: Sy Nishigata(symn@hawaii.edu)
+Description: Get ready to turn in first deliverable due this week (7).
+Attachment: none
+Event Color: red
+Notifications: Pop-up 10 minutes
+Show me as: Busy
+Visibility: Calendar default
+
+
+NOTES: I deleted the event in my calendar, then imported this ics file and it was successfully added back.
