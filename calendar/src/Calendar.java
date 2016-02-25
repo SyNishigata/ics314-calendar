@@ -1,7 +1,10 @@
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
+
+import javax.management.InvalidAttributeValueException;
 import javax.sound.sampled.*;
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,6 +31,7 @@ public class Calendar implements ActionListener {
     JTextField dateTimeEnd = null;
     JTextField location = null;
     JTextField description = null;
+    JTextField status = null;
 
     /* Buttons */
     JButton submit = null;
@@ -47,6 +51,7 @@ public class Calendar implements ActionListener {
         location = new JTextField("University of Hawaii at Manoa, 2500 Campus Rd, " +
                 "Honolulu, HI 96822, United States");
         description = new JTextField("");
+        status = new JTextField("");
 
         /* Create the buttons with action listeners on these objects*/
         submit = new JButton("Submit");
@@ -75,6 +80,8 @@ public class Calendar implements ActionListener {
         frame.add(location);
         frame.add(new JLabel("Description: "));
         frame.add(description);
+        frame.add(new JLabel("Status: "));
+        frame.add(status);
 
         //buttons
         frame.add(submit);
@@ -168,11 +175,15 @@ public class Calendar implements ActionListener {
 
                 String LOCATION = location.getText().replaceAll(",", "\\\\,");
 
-                //***fix this, don't know what it is***
+                //***should be zero. Sequence is incremented when changes are made to a existing event in iCal application.***
                 String SEQUENCE = "0";
 
                 //***fix this, don't know where this is changed***
-                String STATUS = "CONFIRMED";
+                String STATUS = this.status.getText();
+                if (!(STATUS.equalsIgnoreCase("Tentative") || STATUS.equalsIgnoreCase("Confirmed") || STATUS.equalsIgnoreCase("Cancelled"))) {
+                	throw new InvalidAttributeValueException("wrong");
+                }
+                STATUS = STATUS.toUpperCase();
 
                 String SUMMARY = this.eventTitle.getText();
 
