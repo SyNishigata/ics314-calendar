@@ -51,7 +51,7 @@ public class Calendar implements ActionListener {
         location = new JTextField("University of Hawaii at Manoa, 2500 Campus Rd, " +
                 "Honolulu, HI 96822, United States");
         description = new JTextField("");
-        status = new JTextField("");
+        status = new JTextField("Confirmed");
 
         /* Create the buttons with action listeners on these objects*/
         submit = new JButton("Submit");
@@ -117,6 +117,13 @@ public class Calendar implements ActionListener {
                 String startDay = dateTimeStart.getText().substring(8, 10);
                 String startHour = dateTimeStart.getText().substring(11, 13);
                 int startHr = Integer.parseInt(startHour);
+
+                /*if(startHr > 12){
+                    startHr -= 2;  //if pm
+                                   // if am += 10
+                    System.out.println(startHr);
+                }
+                */
                 String startMinute = dateTimeStart.getText().substring(14, 16);
 
                 // For DTEND
