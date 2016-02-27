@@ -32,6 +32,15 @@ public class Calendar implements ActionListener {
     JTextField location = null;
     JTextField description = null;
     JTextField status = null;
+    JTextField latitude = null;
+    JTextField longitude = null;
+    
+    /*@author Kalen
+     * I added in this boolean to use to test whether or not the user is adding geographic coordinates. I also added a second boolean to test whether or not
+     * the user made a error in entering the geographic coordinates.
+     */
+    boolean useGeo = false;
+    boolean geoError = false;
 
     /* Buttons */
     JButton submit = null;
@@ -52,6 +61,8 @@ public class Calendar implements ActionListener {
                 "Honolulu, HI 96822, United States");
         description = new JTextField("");
         status = new JTextField("Confirmed");
+        latitude = new JTextField("");
+        longitude = new JTextField("");
 
         /* Create the buttons with action listeners on these objects*/
         submit = new JButton("Submit");
@@ -78,6 +89,10 @@ public class Calendar implements ActionListener {
         frame.add(dateTimeEnd);
         frame.add(new JLabel("Where: "));
         frame.add(location);
+        frame.add(new JLabel("Latitude: "));
+        frame.add(latitude);
+        frame.add(new JLabel("Longitude: "));
+        frame.add(longitude);
         frame.add(new JLabel("Description: "));
         frame.add(description);
         frame.add(new JLabel("Status: "));
@@ -185,12 +200,36 @@ public class Calendar implements ActionListener {
                 //***should be zero. Sequence is incremented when changes are made to a existing event in iCal application.***
                 String SEQUENCE = "0";
 
-                //***fix this, don't know where this is changed***
+                /* @author Kalen
+                 * Status is used for group events to indicate whether the event is Confirmed (definitely happening), tentative (might not happen), or
+                 * cancelled (not happening).
+                 */
                 String STATUS = this.status.getText();
                 if (!(STATUS.equalsIgnoreCase("Tentative") || STATUS.equalsIgnoreCase("Confirmed") || STATUS.equalsIgnoreCase("Cancelled"))) {
                 	throw new InvalidAttributeValueException("wrong");
                 }
                 STATUS = STATUS.toUpperCase();
+                
+                /*@author Kalen
+                 * 
+                 */
+                String lat = latitude.getText();
+                String lon = longitude.getText();
+                Float latAsFloat = null;
+                Float lonAsFloat = null;
+                if (lat.length() > 0 && lon.length() > 0) {
+                	useGeo = true;
+                }
+                try {
+                	latAsFloat = Float.valueOf(lat);
+                	lonAsFloat = Float.valueOf(lon);
+                }
+                catch (NumberFormatException e) {
+                	geoError = true;
+                	throw new NumberFormatException("");
+                }
+                
+                
 
                 String SUMMARY = this.eventTitle.getText();
 
@@ -206,6 +245,12 @@ public class Calendar implements ActionListener {
                     writer.println("DESCRIPTION:" + DESCRIPTION);
                     writer.println("LAST-MODIFIED:" + LASTMODIFIED);
                     writer.println("LOCATION:" + LOCATION);
+                    /*
+                     * 
+                     */
+                    if (geoError == false && useGeo == true) {
+                    	writer.println("GEO:" + lat + ";" + lon);
+                    }
                     writer.println("SEQUENCE:" + SEQUENCE);
                     writer.println("STATUS:" + STATUS);
                     writer.println("SUMMARY:" + SUMMARY);
@@ -222,6 +267,13 @@ public class Calendar implements ActionListener {
 
             } catch (Exception e) {
                 System.out.println("Reading text field error");
+                
+                /*@author Kalen
+                 * 
+                 */
+                if (geoError == true) {
+                	System.out.println("Not valid geographic coordinates");
+                }
             }
         }
     }
