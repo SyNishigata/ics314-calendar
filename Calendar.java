@@ -30,6 +30,7 @@ public class Calendar implements ActionListener {
     JTextField description = null;
     JTextField lat = null;
     JTextField lon = null;
+    JComboBox cb = null;
     
     /* Buttons */
     JButton submit = null;
@@ -51,6 +52,8 @@ public class Calendar implements ActionListener {
         lat = new JTextField("21.2990213");
         lon = new JTextField("-157.8170355");
         description = new JTextField("");
+        String[] choices = { "PUBLIC","PRIVATE", "CONFIDENTIAL"};
+        cb = new JComboBox(choices);
 
         /* Create the buttons with action listeners on these objects*/
         submit = new JButton("Submit");
@@ -84,6 +87,8 @@ public class Calendar implements ActionListener {
         frame.add(lat);
         frame.add(new JLabel(""));//Make column balanced
         frame.add(lon);
+        frame.add(new JLabel("Classification"));
+        frame.add(cb);
 
         //buttons
         frame.add(submit);
@@ -185,7 +190,9 @@ public class Calendar implements ActionListener {
                 String longi = lon.getText();
                 float longitude = Float.parseFloat(longi);
                
-
+                //Getting choice of CLASSIFICATION
+                String choice = (String) cb.getSelectedItem();
+                
                 //***fix this, don't know what it is***
                 String SEQUENCE = "0";
 
@@ -206,7 +213,8 @@ public class Calendar implements ActionListener {
                     writer.println("DESCRIPTION:" + DESCRIPTION);
                     writer.println("LAST-MODIFIED:" + LASTMODIFIED);
                     writer.println("LOCATION:" + LOCATION);
-                    writer.println("GEO:" + latitude + ";" + longitude); //Adding the GEO to the .ics
+                    writer.println("GEO:" + latitude + ";" + longitude); //Adding the GEO (geographic position) to the .ics
+                    writer.println("CLASS:" + choice); //Adding CLASS (classification) to the .ics
                     writer.println("SEQUENCE:" + SEQUENCE);
                     writer.println("STATUS:" + STATUS);
                     writer.println("SUMMARY:" + SUMMARY);
