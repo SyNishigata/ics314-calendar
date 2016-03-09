@@ -34,6 +34,8 @@ public class Calendar implements ActionListener {
     JTextField status = null;
     JTextField latitude = null;
     JTextField longitude = null;
+    //@author: Ming
+    JComboBox cb = null;
     
     /*@author Kalen
      * I added in this boolean to use to test whether or not the user is adding geographic coordinates. I also added a second boolean to test whether or not
@@ -63,6 +65,9 @@ public class Calendar implements ActionListener {
         status = new JTextField("Confirmed");
         latitude = new JTextField("");
         longitude = new JTextField("");
+        //@author: Ming
+        String[] choices = { "PUBLIC","PRIVATE", "CONFIDENTIAL"};
+        cb = new JComboBox(choices);
 
         /* Create the buttons with action listeners on these objects*/
         submit = new JButton("Submit");
@@ -97,6 +102,9 @@ public class Calendar implements ActionListener {
         frame.add(description);
         frame.add(new JLabel("Status: "));
         frame.add(status);
+        //@author: Ming
+        frame.add(new JLabel("Classification"));
+        frame.add(cb);
 
         //buttons
         frame.add(submit);
@@ -196,6 +204,10 @@ public class Calendar implements ActionListener {
                         (submitHr + 10) + submitMinute + submitSecond + "Z";
 
                 String LOCATION = location.getText().replaceAll(",", "\\\\,");
+                
+                //@author: Ming
+                //Getting choice of CLASSIFICATION
+                String choice = (String) cb.getSelectedItem();
 
                 //***should be zero. Sequence is incremented when changes are made to a existing event in iCal application.***
                 String SEQUENCE = "0";
@@ -211,7 +223,11 @@ public class Calendar implements ActionListener {
                 STATUS = STATUS.toUpperCase();
                 
                 /*@author Kalen
-                 * 
+                 * This block of code is for my implementation of the geographic coordinate thing. First it gets the text from the latitude and longitude
+                 * input. It checks whether or not the length of either is 0, which means the user didn't enter anything, and sets a the boolean useGeo
+                 * accordingly. This boolean is used to determine whether or not the code for adding the geo coordinates will be used. If the user did enter
+                 * something, it tests to see whether or not it is valid input and sets another boolean, geoError, accordingly. If the input was invalid, the 
+                 * block catches it, sets the geoError boolean to true, and throws another exception to be caught by the main catch block for the program.
                  */
                 String lat = latitude.getText();
                 String lon = longitude.getText();
@@ -220,18 +236,16 @@ public class Calendar implements ActionListener {
                 if (lat.length() > 0 && lon.length() > 0) {
                 	useGeo = true;
                 }
-                try {
-                	latAsFloat = Float.valueOf(lat);
-                	lonAsFloat = Float.valueOf(lon);
-                }
-                catch (NumberFormatException e) {
-                	geoError = true;
-                	throw new NumberFormatException("");
-                }
-                
-                
-
-                String SUMMARY = this.eventTitle.getText();
+                if (useGeo) {
+					try {
+						latAsFloat = Float.valueOf(lat);
+						lonAsFloat = Float.valueOf(lon);
+					} catch (NumberFormatException e) {
+						geoError = true;
+						throw new NumberFormatException("");
+					}
+				}
+				String SUMMARY = this.eventTitle.getText();
 
                 PrintWriter writer = null;
                 try {
@@ -245,12 +259,15 @@ public class Calendar implements ActionListener {
                     writer.println("DESCRIPTION:" + DESCRIPTION);
                     writer.println("LAST-MODIFIED:" + LASTMODIFIED);
                     writer.println("LOCATION:" + LOCATION);
-                    /*
-                     * 
+                    /*@author: Kalen
+                     * if user entered in valid coordinates, then the program will write the geo coordinate data. If the user didn't input anything,
+                     * it won't be used.
                      */
                     if (geoError == false && useGeo == true) {
                     	writer.println("GEO:" + lat + ";" + lon);
                     }
+                    //@author: Ming
+                    writer.println("CLASS:" + choice); //Adding CLASS (classification) to the .ics
                     writer.println("SEQUENCE:" + SEQUENCE);
                     writer.println("STATUS:" + STATUS);
                     writer.println("SUMMARY:" + SUMMARY);
@@ -269,7 +286,8 @@ public class Calendar implements ActionListener {
                 System.out.println("Reading text field error");
                 
                 /*@author Kalen
-                 * 
+                 * If the user inputted something that was invalid, the geo coordinate code block will set geoError to true, so the user knows that was
+                 * the source of the error.
                  */
                 if (geoError == true) {
                 	System.out.println("Not valid geographic coordinates");
