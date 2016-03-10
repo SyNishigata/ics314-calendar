@@ -12,7 +12,7 @@ public class NumericVerifier extends InputVerifier {
         }
         else {
             try {
-                Integer.parseInt(text);
+                Float.parseFloat(text);
                 return true;
             } catch (NumberFormatException e) {
                 System.err.println("Please enter only numbers in this field.");
