@@ -31,10 +31,14 @@ public class Calendar implements ActionListener {
     /* Create a new Date variable recording the dateTime as soon as the program starts */
     Date date = new Date();
 
+    /* Create a new verifier using the xVerifier.java class */
+    InputVerifier numVerifier = new NumericVerifier();
+    InputVerifier stringVerifier = new StringVerifier();
 
 
 
-    /* Text fields */
+
+    /* Input Fields */
     JTextField eventTitle = null;
     JTextField dateTimeStart = null;
     JTextField dateTimeEnd = null;
@@ -45,7 +49,7 @@ public class Calendar implements ActionListener {
     JTextField longitude = null;
     //@author: Ming
     JComboBox cb = null;
-    
+
     /*@author Kalen
      * I added in this boolean to use to test whether or not the user is adding geographic coordinates. I also added a second boolean to test whether or not
      * the user made a error in entering the geographic coordinates.
@@ -93,6 +97,11 @@ public class Calendar implements ActionListener {
 
         /* Setting a simple layout for the frame*/
         frame.setLayout(new GridLayout(0, 2));
+
+        /* Verifying the fields */
+        eventTitle.setInputVerifier(stringVerifier);
+        latitude.setInputVerifier(numVerifier);
+        longitude.setInputVerifier(numVerifier);
 
         /* Add all the above widgets to the frame, one after the other */
         //text fields
