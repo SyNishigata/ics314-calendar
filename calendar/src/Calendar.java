@@ -40,7 +40,7 @@ public class Calendar implements ActionListener {
     JTextField dateTimeEnd = null;
     JTextField location = null;
     JTextField description = null;
-    JTextField status = null;
+    JComboBox status = null;
     JTextField latitude = null;
     JTextField longitude = null;
     //@author: Ming
@@ -71,7 +71,8 @@ public class Calendar implements ActionListener {
         location = new JTextField("University of Hawaii at Manoa, 2500 Campus Rd, " +
                 "Honolulu, HI 96822, United States");
         description = new JTextField("");
-        status = new JTextField("Confirmed");
+        String[] statuses = {"TENTATIVE","CONFIRMED","CANCELLED"};
+        status = new JComboBox(statuses);
         latitude = new JTextField("");
         longitude = new JTextField("");
         //@author: Ming
@@ -229,11 +230,15 @@ public class Calendar implements ActionListener {
                  * Status is used for group events to indicate whether the event is Confirmed (definitely happening), tentative (might not happen), or
                  * cancelled (not happening).
                  */
-                String STATUS = this.status.getText();
+                String STATUS = (String) status.getSelectedItem();
+                
+                /* Note:this is the old thing for status. I'm leaving it here in case I want to see it again.
                 if (!(STATUS.equalsIgnoreCase("Tentative") || STATUS.equalsIgnoreCase("Confirmed") || STATUS.equalsIgnoreCase("Cancelled"))) {
                 	throw new InvalidAttributeValueException("wrong");
                 }
                 STATUS = STATUS.toUpperCase();
+                */
+                
                 
                 /*@author Kalen
                  * This block of code is for my implementation of the geographic coordinate thing. First it gets the text from the latitude and longitude
