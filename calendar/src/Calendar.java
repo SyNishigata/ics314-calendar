@@ -7,12 +7,11 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /*
  * Created by Sy on 2/22/2016.
@@ -20,10 +19,20 @@ import java.util.Date;
 
 public class Calendar implements ActionListener {
 
-    /* Set the DateFormat and create a Date variable */
+    /* Create a new Date Format without seconds */
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+    /* Create a new Date Format with seconds */
+    DateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    /* Create a new Date Format without seconds or GMT */
+    DateFormat dateFormat3 = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+    /* Create a new Date variable recording the dateTime as soon as the program starts */
     Date date = new Date();
-    //System.out.println(dateFormat.format(date)); //2014/08/06 15:59:48
+
+
+
 
     /* Text fields */
     JTextField eventTitle = null;
@@ -54,7 +63,6 @@ public class Calendar implements ActionListener {
 
     /* Constructor */
     public Calendar() {
-
         /* Create the text fields */
         eventTitle = new JTextField("Untitled Event");
         dateTimeStart = new JTextField(dateFormat.format(date));
@@ -69,7 +77,7 @@ public class Calendar implements ActionListener {
         String[] choices = { "PUBLIC","PRIVATE", "CONFIDENTIAL"};
         cb = new JComboBox(choices);
 
-        /* Create the buttons with action listeners on these objects*/
+        /* Create the buttons with action listeners on these objects */
         submit = new JButton("Submit");
         submit.addActionListener(this);
         quit = new JButton("Quit");
@@ -119,51 +127,58 @@ public class Calendar implements ActionListener {
         new Calendar();
     }
 
+
+    /* Method to convert hours to Google calendar .ics file format ?GMT?(w/e timezone) = 10+ HST*/
+    public int hourConversion(int hour){
+        if(hour < 14){
+            hour += 10;  // if am += 10
+        }
+        else{
+            hour -= 14; // if pm -= 14, essentially +10 -24. Ex: 3pm = 15pm + 10 = 25pm - 24 = 1pm
+        }
+        return hour;
+    }
+
     @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() == this.quit) {
             // If the quit button is clicked, then quit
-
             System.exit(0);
         } else if (event.getSource() == this.submit) {
             // If the submit button is clicked, then...
 
-
-            // Create a new Date and DateFormat(with seconds) for datetime at submit click
+            // Records dateTime when user clicks submit
             Date date2 = new Date();
-            DateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            System.out.println("Submitted");
+
+            // Sets Time Zone to Google calendar default: GMT
+            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+            dateFormat2.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+            //Submitting process begin:
+
             try {
                 // For DTSTART
-                String startYear = dateTimeStart.getText().substring(0, 4);
-                String startMonth = dateTimeStart.getText().substring(5, 7);
-                String startDay = dateTimeStart.getText().substring(8, 10);
-                String startHour = dateTimeStart.getText().substring(11, 13);
-                int startHr = Integer.parseInt(startHour);
-
-                /*if(startHr > 12){
-                    startHr -= 2;  //if pm
-                                   // if am += 10
-                    System.out.println(startHr);
-                }
-                */
-                String startMinute = dateTimeStart.getText().substring(14, 16);
+                Date startDate = dateFormat3.parse(dateTimeStart.getText());
+                String startYear = dateFormat.format(startDate).substring(0, 4);
+                String startMonth = dateFormat.format(startDate).substring(5, 7);
+                String startDay = dateFormat.format(startDate).substring(8, 10);
+                String startHour = dateFormat.format(startDate).substring(11, 13);
+                String startMinute = dateFormat.format(startDate).substring(14, 16);
 
                 // For DTEND
-                String endYear = dateTimeEnd.getText().substring(0, 4);
-                String endMonth = dateTimeEnd.getText().substring(5, 7);
-                String endDay = dateTimeEnd.getText().substring(8, 10);
-                String endHour = dateTimeEnd.getText().substring(11, 13);
-                int endHr = Integer.parseInt(endHour);
-                String endMinute = dateTimeEnd.getText().substring(14, 16);
+                Date endDate = dateFormat3.parse(dateTimeEnd.getText());
+                String endYear = dateFormat.format(endDate).substring(0, 4);
+                String endMonth = dateFormat.format(endDate).substring(5, 7);
+                String endDay = dateFormat.format(endDate).substring(8, 10);
+                String endHour = dateFormat.format(endDate).substring(11, 13);
+                String endMinute = dateFormat.format(endDate).substring(14, 16);
 
                 // For DTSTAMP ***fix this. what's the difference between this and CREATED??***
-                String currentYear = dateFormat.format(date).substring(0, 4);
-                String currentMonth = dateFormat.format(date).substring(5, 7);
-                String currentDay = dateFormat.format(date).substring(8, 10);
-                String currentHour = dateFormat.format(date).substring(11, 13);
-                int currentHr = Integer.parseInt(currentHour);
-                String currentMinute = dateFormat.format(date).substring(14, 16);
+                String currentYear = dateFormat2.format(date).substring(0, 4);
+                String currentMonth = dateFormat2.format(date).substring(5, 7);
+                String currentDay = dateFormat2.format(date).substring(8, 10);
+                String currentHour = dateFormat2.format(date).substring(11, 13);
+                String currentMinute = dateFormat2.format(date).substring(14, 16);
                 String currentSecond = dateFormat2.format(date).substring(17, 19);
 
                 // For CREATED and LAST-MODIFIED ***maybe separate these two later***
@@ -171,10 +186,8 @@ public class Calendar implements ActionListener {
                 String submitMonth = dateFormat2.format(date2).substring(5, 7);
                 String submitDay = dateFormat2.format(date2).substring(8, 10);
                 String submitHour = dateFormat2.format(date2).substring(11, 13);
-                int submitHr = Integer.parseInt(submitHour);
                 String submitMinute = dateFormat2.format(date2).substring(14, 16);
                 String submitSecond = dateFormat2.format(date2).substring(17, 19);
-
 
                 // Variables to be written into .ics file
                 String startText = "BEGIN:VCALENDAR\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\n" +
@@ -182,26 +195,25 @@ public class Calendar implements ActionListener {
                         "X-WR-CALNAME:symn@hawaii.edu\n" + //need to fix so it takes the user's email instead
                         "X-WR-TIMEZONE:Pacific/Honolulu\nBEGIN:VEVENT\n";
 
-                // Hours are +10 because that's how it's recorded from Google calendar
                 String DTSTART = startYear + startMonth + startDay + "T" +
-                        (startHr + 10) + startMinute + "00Z";
+                        startHour + startMinute + "00Z";
 
                 String DTEND = endYear + endMonth + endDay + "T" +
-                        (endHr + 10) + endMinute + "00Z";
+                        endHour + endMinute + "00Z";
 
                 String DTSTAMP = currentYear + currentMonth + currentDay + "T" +
-                        (currentHr + 10) + currentMinute + currentSecond + "Z";
+                        currentHour + currentMinute + currentSecond + "Z";
 
                 //***fix this, don't know what it is***
                 String UID = "rp6v6nppa2nm9gqfh1ais4k3mo@google.com";
 
                 String CREATED = submitYear + submitMonth + submitDay + "T" +
-                        (submitHr + 10) + submitMinute + submitSecond + "Z";
+                        submitHour + submitMinute + submitSecond + "Z";
 
                 String DESCRIPTION = this.description.getText();
 
                 String LASTMODIFIED = submitYear + submitMonth + submitDay + "T" +
-                        (submitHr + 10) + submitMinute + submitSecond + "Z";
+                        submitHour + submitMinute + submitSecond + "Z";
 
                 String LOCATION = location.getText().replaceAll(",", "\\\\,");
                 
@@ -275,13 +287,11 @@ public class Calendar implements ActionListener {
                             "END:VEVENT\n" +
                             "END:VCALENDAR");
                     writer.close();
+                    System.out.println("Submitted.");
                 } catch (Exception e) {
                     System.out.println("Error!");
                     e.printStackTrace();
                 }
-
-
-
             } catch (Exception e) {
                 System.out.println("Reading text field error");
                 
