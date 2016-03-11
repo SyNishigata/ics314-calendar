@@ -60,6 +60,7 @@ public class Calendar implements ActionListener {
 
     /* Buttons */
     JButton submit = null;
+    JButton importICS = null;
     JButton quit = null;
 
     /* Panel */
@@ -86,6 +87,8 @@ public class Calendar implements ActionListener {
         /* Create the buttons with action listeners on these objects */
         submit = new JButton("Submit");
         submit.addActionListener(this);
+        importICS = new JButton("Import");
+        importICS.addActionListener(this);
         quit = new JButton("Quit");
         quit.addActionListener(this);
 
@@ -127,6 +130,7 @@ public class Calendar implements ActionListener {
 
         //buttons
         frame.add(submit);
+        frame.add(importICS);
         frame.add(quit);
 
         /* Pack then render the frame */
@@ -329,6 +333,11 @@ public class Calendar implements ActionListener {
                 	System.out.println("Not valid geographic coordinates");
                 }*/
             }
+        }
+        else if (event.getSource() == this.importICS) {
+            // If the import button is clicked, then...
+
+
         }
     }
 
