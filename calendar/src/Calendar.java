@@ -342,9 +342,10 @@ public class Calendar implements ActionListener {
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
             String title = "SUMMARY";
-            String date = "DTSTART";
+            String dateStart = "DTSTART";
+            String dateEnd = "DTEND";
             String geo = "GEO";
-            String userICS = "", userTitle = "", userDate = "", userLatitude = "", userLongitude = "";
+            String userICS = "", userTitle = "", userSDate = "", userEDate = "", userLatitude = "", userLongitude = "";
 
             while (line != null) {
               sb.append(line);
@@ -353,9 +354,12 @@ public class Calendar implements ActionListener {
                 userTitle = line.substring(8, line.length());
                 // System.out.println(userTitle);
               }
-              if (line.contains(date)) {
-                userDate = line.substring(8, line.length());
-                // System.out.println(userDate);
+              if (line.contains(dateStart)) {
+                userSDate = line.substring(8, line.length());
+                //System.out.println(userDate);
+              }
+              if(line.contains(dateEnd)){
+                userEDate = line.substring(8, line.length());
               }
               if (line.contains(geo)) {
                 String[] coordinates = line.split(";");
@@ -368,14 +372,15 @@ public class Calendar implements ActionListener {
             }
 
             userICS = sb.toString();
-            IcsEvent userEvent = new IcsEvent(userICS, userTitle, userDate, userLatitude, userLongitude);
+            
+            IcsEvent userEvent = new IcsEvent(userICS, userTitle, userSDate, userEDate, userLatitude, userLongitude);
 
-            if (!(userDate.equals(""))) {
+            if (!(userSDate.equals(""))) {
               Events.add(userEvent);
               Collections.sort(Events, new Comparator<IcsEvent>() {
                 @Override
                 public int compare(IcsEvent e1, IcsEvent e2) {
-                  return e1.getDate().compareTo(e2.getDate());
+                  return e1.getStartDate().compareTo(e2.getStartDate());
                 }
               });
             }
@@ -386,9 +391,23 @@ public class Calendar implements ActionListener {
             br.close();
 
             System.out.println("List of imported events sorted by datetime: ");
+           
+        
             for (IcsEvent Event : Events) {
-              System.out.println(Event.getTitle());
+              System.out.print("Event: \""+Event.getTitle() + "\" ");
+              
+              String startTime = Event.getStartDate();
+              String sTime = startTime.substring(4, 6) + "/" + startTime.substring(6,8) + " " +
+                    startTime.substring(9, 11) + ":" + startTime.substring(11,13);
+              
+              String endTime = Event.getEndDate();
+              String eTime = endTime.substring(2, 4) + "/" + endTime.substring(4,6) + " " +
+                  endTime.substring(7, 9) + ":" + endTime.substring(9,11);
+              
+              System.out.print("occurs FROM " + sTime + " TO " + eTime  +"\n");
+              
             }
+            System.out.println();
           }
         }
         catch (FileNotFoundException e) {

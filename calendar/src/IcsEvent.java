@@ -5,14 +5,16 @@ public class IcsEvent {
 
     private String ics;
     private String title;
-    private String date;
+    private String startDate;
+    private String endDate;
     private String latitude;
     private String longitude;
 
-    public IcsEvent(String ics, String title, String date, String latitude, String longitude) {
+    public IcsEvent(String ics, String title, String sdate,String edate, String latitude, String longitude) {
         this.ics = ics;
         this.title = title;
-        this.date = date;
+        this.startDate = sdate;
+        this.endDate = edate;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -25,9 +27,13 @@ public class IcsEvent {
         return this.title;
     }
 
-    public String getDate() {
-        return this.date;
+    public String getStartDate() {
+        return this.startDate;
     }
+    
+    public String getEndDate() {
+      return this.endDate;
+  }
 
     public String getLatitude() {
         return this.latitude;
