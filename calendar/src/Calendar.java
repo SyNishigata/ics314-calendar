@@ -353,7 +353,7 @@ public class Calendar implements ActionListener {
                                 //System.out.println(userDate);
                             }
                             if (line.contains(dateEnd)) {
-                                userEDate = line.substring(8, line.length());
+                                userEDate = line.substring(6, line.length());
                             }
                             if (line.contains(geo)) {
                                 String[] coordinates = line.split(";");
@@ -394,8 +394,8 @@ public class Calendar implements ActionListener {
                                     startTime.substring(9, 11) + ":" + startTime.substring(11, 13);
 
                             String endTime = Event.getEndDate();
-                            String eTime = endTime.substring(2, 4) + "/" + endTime.substring(4, 6) + " " +
-                                    endTime.substring(7, 9) + ":" + endTime.substring(9, 11);
+                            String eTime = endTime.substring(4, 6) + "/" + endTime.substring(6, 8) + " " +
+                                    endTime.substring(9, 11) + ":" + endTime.substring(11, 13);
 
                             System.out.print("occurs FROM " + sTime + " TO " + eTime + "\n");
 
