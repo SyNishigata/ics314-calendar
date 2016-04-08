@@ -62,6 +62,7 @@ public class Calendar implements ActionListener {
     JButton submit = null;
     JButton importICS = null;
     JButton quit = null;
+    JFrame frame = null;
 
     /* Panel */
     Panel panel = null;
@@ -96,7 +97,7 @@ public class Calendar implements ActionListener {
         panel = new Panel();
 
         /* Create a Swing frame */
-        JFrame frame = new JFrame();
+        frame = new JFrame();
 
         /* Setting a simple layout for the frame*/
         frame.setLayout(new GridLayout(0, 2));
@@ -336,6 +337,25 @@ public class Calendar implements ActionListener {
         }
         else if (event.getSource() == this.importICS) {
             // If the import button is clicked, then...
+        	JFileChooser importFile = new JFileChooser();
+      	    	importFile.showOpenDialog(null);
+        	String path = importFile.getSelectedFile().getAbsolutePath(); 
+      		System.out.println(path);
+      		try {
+        		BufferedReader br = new BufferedReader(new FileReader(path));
+        		if(br.ready()){
+          
+          		//read file? do stuff?
+          	
+          
+        		}
+      		}
+      		catch (FileNotFoundException e) {
+        		e.printStackTrace();
+      		}
+      		catch (IOException e) {
+		 	e.printStackTrace();
+      		}
 
 
         }
