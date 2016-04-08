@@ -6,14 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.management.InvalidAttributeValueException;
-import javax.sound.sampled.*;
 import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -22,7 +19,7 @@ import java.util.TimeZone;
  * Created by Sy on 2/22/2016.
  */
 
-public class Calendar implements ActionListener {
+public class Calendar_knb implements ActionListener {
 
     /* Create a new Date Format without seconds */
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -73,7 +70,7 @@ public class Calendar implements ActionListener {
 
 
     /* Constructor */
-    public Calendar() {
+    public Calendar_knb() {
         /* Create the text fields */
         eventTitle = new JTextField("Untitled Event");
         dateTimeStart = new JTextField(dateFormat.format(date));
@@ -149,7 +146,7 @@ public class Calendar implements ActionListener {
     }
 
     public static void main(String[] args) {
-        new Calendar();
+        new Calendar_knb();
     }
 
 
@@ -215,7 +212,7 @@ public class Calendar implements ActionListener {
                 String submitSecond = dateFormat2.format(date2).substring(17, 19);
 
                 // Variables to be written into .ics file
-                String startText = "BEGIN:VCALENDAR\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\n" +
+                String startText = "BEGIN:VCALENDAR\nPRODID:-//Google Inc//Google Calendar_knb 70.9054//EN\n" +
                         "VERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n" +
                         "X-WR-CALNAME:symn@hawaii.edu\n" + //need to fix so it takes the user's email instead
                         "X-WR-TIMEZONE:Pacific/Honolulu\nBEGIN:VEVENT\n";
