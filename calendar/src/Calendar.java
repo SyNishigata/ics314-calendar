@@ -13,8 +13,8 @@ import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.List;
 
 /*
  * Created by Sy on 2/22/2016.
@@ -37,6 +37,9 @@ public class Calendar implements ActionListener {
     /* Create a new verifier using the xVerifier.java class */
     InputVerifier numVerifier = new NumericVerifier();
     InputVerifier stringVerifier = new StringVerifier();
+
+    /* Create a linked list to hold events for import button function*/
+    List<IcsEvent> Events = new LinkedList<IcsEvent>();
 
 
 
@@ -64,6 +67,7 @@ public class Calendar implements ActionListener {
     /* Buttons */
     JButton submit = null;
     JButton importICS = null;
+    JButton calculate = null;
     JButton quit = null;
     JFrame frame = null;
 
@@ -93,6 +97,8 @@ public class Calendar implements ActionListener {
         submit.addActionListener(this);
         importICS = new JButton("Import");
         importICS.addActionListener(this);
+        calculate = new JButton("Calculate GCD");
+        calculate.addActionListener(this);
         quit = new JButton("Quit");
         quit.addActionListener(this);
 
@@ -133,8 +139,9 @@ public class Calendar implements ActionListener {
         frame.add(cb);
 
         //buttons
-        frame.add(submit);
         frame.add(importICS);
+        frame.add(calculate);
+        frame.add(submit);
         frame.add(quit);
 
         /* Pack then render the frame */
@@ -341,26 +348,147 @@ public class Calendar implements ActionListener {
         else if (event.getSource() == this.importICS) {
             // If the import button is clicked, then...
         	JFileChooser importFile = new JFileChooser();
-      	    	importFile.showOpenDialog(null);
-        	String path = importFile.getSelectedFile().getAbsolutePath(); 
-      		System.out.println(path);
+            importFile.showOpenDialog(null);
+        	String path = importFile.getSelectedFile().getAbsolutePath();
       		try {
         		BufferedReader br = new BufferedReader(new FileReader(path));
         		if(br.ready()){
-          
-          		//read file? do stuff?
-          	
-          
+                    StringBuilder sb = new StringBuilder();
+                    String line = br.readLine();
+                    String title = "SUMMARY";
+                    String date = "DTSTART";
+                    String geo = "GEO";
+                    String userICS = "", userTitle = "", userDate = "", userLatitude = "", userLongitude = "";
+
+                    while (line != null) {
+                        sb.append(line);
+                        sb.append("\n");
+                        if(line.contains(title)){
+                            userTitle = line.substring(8, line.length());
+                            //System.out.println(userTitle);
+                        }
+                        if(line.contains(date)){
+                            userDate = line.substring(8, line.length());
+                            //System.out.println(userDate);
+                        }
+                        if(line.contains(geo)){
+                            String[] coordinates = line.split(";");
+                            userLatitude = coordinates[0].substring(4);
+                            //System.out.println(userLatitude);
+                            userLongitude = coordinates[1];
+                            //System.out.println(userLongitude);
+                        }
+                        line = br.readLine();
+                    }
+
+                    userICS = sb.toString();
+                    IcsEvent userEvent = new IcsEvent(userICS, userTitle, userDate, userLatitude, userLongitude);
+
+                    if(!(userDate.equals(""))){
+                        Events.add(userEvent);
+                        Collections.sort(Events, new Comparator<IcsEvent>() {
+                            @Override
+                            public int compare(IcsEvent e1, IcsEvent e2) {
+                                return e1.getDate().compareTo(e2.getDate());
+                            }
+                        });
+                    }
+                    else{
+                        System.err.println("This file does not have a datetime specified");
+                    }
+
+                    br.close();
+
+                    System.out.println("List of imported events sorted by datetime: ");
+                    for (IcsEvent Event : Events) {
+                        System.out.println(Event.getTitle());
+                    }
         		}
       		}
       		catch (FileNotFoundException e) {
         		e.printStackTrace();
       		}
       		catch (IOException e) {
-		 	e.printStackTrace();
+		 	    e.printStackTrace();
       		}
 
 
+        }
+        else if (event.getSource() == this.calculate) {
+            String gcd = "";
+            if(Events.size() > 1){
+                System.out.println("Calculating Great Circle Distances");
+                for (int i = 1; i < Events.size() + 1; i++) {
+                    IcsEvent e1 = Events.get(i - 1);
+
+
+                    if(i == Events.size()){
+                        gcd = "COMMENT:Great Circle Distance cannot be calculated because this event does not" +
+                                " have any events following it (for the date specified) ";
+                    }
+                    else {
+                        IcsEvent e2 = Events.get(i);
+                        if (!(e1.getLatitude().equals("") || e1.getLongitude().equals(""))) {
+                            if (!(e2.getLatitude().equals("") || e2.getLongitude().equals(""))) {
+
+                                /* This code is from: http://introcs.cs.princeton.edu/java/12types/GreatCircle.java.html */
+                                double x1 = Math.toRadians(Double.parseDouble(e1.getLatitude()));
+                                double y1 = Math.toRadians(Double.parseDouble(e1.getLongitude()));
+                                double x2 = Math.toRadians(Double.parseDouble(e2.getLatitude()));
+                                double y2 = Math.toRadians(Double.parseDouble(e2.getLongitude()));
+
+                                // great circle distance in radians
+                                double angle1 = Math.acos(Math.sin(x1) * Math.sin(x2)
+                                        + Math.cos(x1) * Math.cos(x2) * Math.cos(y1 - y2));
+
+                                // convert back to degrees
+                                angle1 = Math.toDegrees(angle1);
+
+                                // each degree on a great circle of Earth is 60 nautical miles
+                                double distance = 60 * angle1;
+                                /* end code */
+
+                                // 1 nautical mile = 1.1508 statute miles
+                                double distance1 = distance * 1.1508;
+
+                                // 1 nautical mile = 1.852 kilometers
+                                double distance2 = distance * 1.852;
+
+                                gcd = "COMMENT:Great Circle Distance to next upcoming event = " + distance1
+                                        + " statute miles or " + distance2 + " kilometers.";
+                            } else {
+                                gcd = "COMMENT:Great Circle Distance cannot be calculated because the" +
+                                        " event following this does not have a geographic position specified ";
+                            }
+                        } else {
+                            gcd = "COMMENT:Great Circle Distance cannot be calculated because this" +
+                                    " event does not have a geographic position specified ";
+                        }
+                    }
+                    //System.out.println(gcd);
+                    //System.out.println(Events.get(i).getDate());
+
+                    String[] icsParts = e1.getICS().split("LOCATION");
+                    String part1 = icsParts[0];
+                    String part2 = icsParts[1];
+                    String combined = part1 + gcd + "\n" + "LOCATION" + part2;
+                    PrintWriter writer = null;
+                    try {
+                        writer = new PrintWriter(e1.getTitle() + ".ics");
+                        writer.print(combined);
+                        writer.close();
+                        System.out.println("File: " + e1.getTitle() + ".ics has been modified to" +
+                                " include Great Circle Distance in a COMMENT");
+                    } catch (Exception e) {
+                    System.out.println("Error!");
+                    e.printStackTrace();
+                    }
+                }//end for loop that cycles through events
+            }
+            else{
+                System.err.println("Not enough .ics events were imported.");
+                System.err.println("At least 2 events are required to compute a Great Circle Distance");
+            }
         }
     }
 
