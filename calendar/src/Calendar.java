@@ -62,6 +62,7 @@ public class Calendar implements ActionListener {
     JButton calculate = null;
     JButton quit = null;
     JFrame frame = null;
+    JTextField newFileName = null;///k
 
     /* Panel */
     Panel panel = null;
@@ -86,6 +87,7 @@ public class Calendar implements ActionListener {
     /* Create the buttons with action listeners on these objects */
         submit = new JButton("Submit");
         submit.addActionListener(this);
+        newFileName = new JTextField("");///k
         importICS = new JButton("Import");
         importICS.addActionListener(this);
         calculate = new JButton("Calculate GCD");
@@ -133,6 +135,7 @@ public class Calendar implements ActionListener {
         frame.add(importICS);
         frame.add(calculate);
         frame.add(submit);
+        frame.add(newFileName);///k
         frame.add(quit);
 
     /* Pack then render the frame */
@@ -277,7 +280,8 @@ public class Calendar implements ActionListener {
 
                 PrintWriter writer = null;
                 try {
-                    writer = new PrintWriter("symn.ics");
+                	String s = newFileName.getText();///k
+                    writer = new PrintWriter(s);///k
                     writer.print(startText);
                     writer.println("DTSTART:" + DTSTART);
                     writer.println("DTEND:" + DTEND);
