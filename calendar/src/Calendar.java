@@ -45,6 +45,7 @@ public class Calendar implements ActionListener {
 
 
     /* Input Fields */
+    JTextField email = null;
     JTextField eventTitle = null;
     JTextField dateTimeStart = null;
     JTextField dateTimeEnd = null;
@@ -79,6 +80,7 @@ public class Calendar implements ActionListener {
     /* Constructor */
     public Calendar() {
         /* Create the text fields */
+    	email = new JTextField("");
         eventTitle = new JTextField("Untitled Event");
         dateTimeStart = new JTextField(dateFormat.format(date));
         dateTimeEnd = new JTextField(dateFormat.format(date));
@@ -94,10 +96,10 @@ public class Calendar implements ActionListener {
         cb = new JComboBox(choices);
 
         /* Create the buttons with action listeners on these objects */
-        submit = new JButton("Submit");
+        submit = new JButton("Submit data entered into new file");
         submit.addActionListener(this);
         newFileName = new JTextField("");///k
-        importICS = new JButton("Import");
+        importICS = new JButton("Import file to calculate GCD");
         importICS.addActionListener(this);
         calculate = new JButton("Calculate GCD");
         calculate.addActionListener(this);
@@ -120,6 +122,8 @@ public class Calendar implements ActionListener {
 
         /* Add all the above widgets to the frame, one after the other */
         //text fields
+        frame.add(new JLabel("Email address: "));
+        frame.add(email);
         frame.add(new JLabel("Event Title: "));
         frame.add(eventTitle);
         frame.add(new JLabel("From: "));
@@ -237,7 +241,7 @@ public class Calendar implements ActionListener {
                 // Variables to be written into .ics file
                 String startText = "BEGIN:VCALENDAR\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\n" +
                         version + "CALSCALE:GREGORIAN\nMETHOD:PUBLISH\n" +
-                        "X-WR-CALNAME:symn@hawaii.edu\n" + //need to fix so it takes the user's email instead
+                        "X-WR-CALNAME:"+ email.getText() + "\n" + 
                         "X-WR-TIMEZONE:Pacific/Honolulu\nBEGIN:VEVENT\n";
 
                 String DTSTART = startYear + startMonth + startDay + "T" +
@@ -248,9 +252,17 @@ public class Calendar implements ActionListener {
 
                 String DTSTAMP = currentYear + currentMonth + currentDay + "T" +
                         currentHour + currentMinute + currentSecond + "Z";
-
-                //***fix this, don't know what it is***
-                String UID = "rp6v6nppa2nm9gqfh1ais4k3mo@google.com";
+                
+                /*This sets the UID to something that should be next to impossible to replicated somewhere else. The RFC suggests using the domain name
+                 * along with the date time value and a unique identifer. I used the data from DTSTAMP plus the given email address as it's highly unlikely
+                 * someone could create an event at the exact same second in time, and used a random integer from 0-1000 plus a random character.
+                 */
+                Random random = new Random();
+                Integer i = random.nextInt(1001);
+                Integer j = random.nextInt(26);
+                int c = 'a';
+                c = c + j;
+                String UID = DTSTAMP + i.toString() + String.valueOf(c) + email.getText();
 
                 String CREATED = submitYear + submitMonth + submitDay + "T" +
                         submitHour + submitMinute + submitSecond + "Z";
@@ -363,6 +375,8 @@ public class Calendar implements ActionListener {
                 	System.out.println("Not valid geographic coordinates");
                 }*/
             }
+			newFileName.setText("");
+			email.setText("");
         }
         else if (event.getSource() == this.importICS) {
             // If the import button is clicked, then...
