@@ -217,10 +217,26 @@ public class Calendar implements ActionListener {
                 String submitHour = dateFormat2.format(date2).substring(11, 13);
                 String submitMinute = dateFormat2.format(date2).substring(14, 16);
                 String submitSecond = dateFormat2.format(date2).substring(17, 19);
+                
+                /*
+                 * implementation for version. According to my research, .ics files correspond to version 2, and .vcs files correspond to version 1, so depending
+                 * on whether or not the user make the file name .ics or .vcs would determine what the version is. Of course, we've been designing this program
+                 * to create a .ics file, so there may be a little (or a lot) wrong with having data we designed for a .ics file put into a .vcs file, but to
+                 * go deeper than this is beyond the scope of what I believe the project is asking for, and beyond my ability to implement in a short time.
+                 */
+            	String s = newFileName.getText();///k
+            	String filetype = s.substring(s.length() - 3, s.length());
+            	String version = null;
+            	if (filetype.equalsIgnoreCase("vcs")) {
+            		version = "VERSION:1.0\n";
+            	}
+            	else {
+            		version = "VERSION:2.0\n";
+            	}
 
                 // Variables to be written into .ics file
                 String startText = "BEGIN:VCALENDAR\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\n" +
-                        "VERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n" +
+                        version + "CALSCALE:GREGORIAN\nMETHOD:PUBLISH\n" +
                         "X-WR-CALNAME:symn@hawaii.edu\n" + //need to fix so it takes the user's email instead
                         "X-WR-TIMEZONE:Pacific/Honolulu\nBEGIN:VEVENT\n";
 
@@ -300,7 +316,6 @@ public class Calendar implements ActionListener {
 
                 PrintWriter writer = null;
                 try {
-                	String s = newFileName.getText();///k
                     writer = new PrintWriter(s);///k
                     writer.print(startText);
                     writer.println("DTSTART:" + DTSTART);
@@ -474,7 +489,13 @@ public class Calendar implements ActionListener {
                     }
                     //System.out.println(gcd);
                     //System.out.println(Events.get(i).getDate());
-
+                    
+                    /*
+                     * Kalen note to self. What this block of code is doing is getting the entire content of the .ics file, and then splitting in into a
+                     * String[]  of size 2, with all the content before the word "LOCATION" into the zeroth index of the array, and all the contents after the
+                     * word "LOCATION" into the first index of the array. It then puts the Great Circle Distance comment in between these two strings and
+                     * combines them all and writes it back out to the file.
+                     */
                     String[] icsParts = e1.getICS().split("LOCATION");
                     String part1 = icsParts[0];
                     String part2 = icsParts[1];
@@ -484,7 +505,7 @@ public class Calendar implements ActionListener {
                         writer = new PrintWriter(e1.getFileName());
                         writer.print(combined);
                         writer.close();
-                        System.out.println("File: " + e1.getTitle() + ".ics has been modified to" +
+                        System.out.println("File: " + e1.getFileName() + ".ics has been modified to" +
                                 " include Great Circle Distance in a COMMENT");
                     } catch (Exception e) {
                     System.out.println("Error!");

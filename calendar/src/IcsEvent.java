@@ -2,7 +2,10 @@
  * Created by Sy on 4/7/2016.
  */
 public class IcsEvent {
-
+	
+	/*
+	 * Kalen note to self: the String variable "ics" is the entire content to the .ics file
+	 */
     private String ics;
     private String title;
     private String date;
