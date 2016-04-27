@@ -5,18 +5,19 @@ public class IcsEvent {
 
     private String ics;
     private String title;
-    private String startDate;
-    private String endDate;
+    private String date;
     private String latitude;
     private String longitude;
+    //Kalen addition
+    private String fileName;
 
-    public IcsEvent(String ics, String title, String sdate,String edate, String latitude, String longitude) {
+    public IcsEvent(String ics, String title, String date, String latitude, String longitude, String fileName) {
         this.ics = ics;
         this.title = title;
-        this.startDate = sdate;
-        this.endDate = edate;
+        this.date = date;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.fileName = fileName;
     }
 
     public String getICS() {
@@ -27,13 +28,9 @@ public class IcsEvent {
         return this.title;
     }
 
-    public String getStartDate() {
-        return this.startDate;
+    public String getDate() {
+        return this.date;
     }
-    
-    public String getEndDate() {
-      return this.endDate;
-  }
 
     public String getLatitude() {
         return this.latitude;
@@ -41,5 +38,10 @@ public class IcsEvent {
 
     public String getLongitude() {
         return this.longitude;
+    }
+    
+    //Kalen addition
+    public String getFileName() {
+    	return this.fileName;
     }
 }

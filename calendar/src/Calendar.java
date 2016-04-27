@@ -1,13 +1,17 @@
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.management.InvalidAttributeValueException;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -34,8 +38,11 @@ public class Calendar implements ActionListener {
     InputVerifier numVerifier = new NumericVerifier();
     InputVerifier stringVerifier = new StringVerifier();
 
-    /* Create a linked list to hold events for import button function */
+    /* Create a linked list to hold events for import button function*/
     List<IcsEvent> Events = new LinkedList<IcsEvent>();
+
+
+
 
     /* Input Fields */
     JTextField eventTitle = null;
@@ -46,15 +53,16 @@ public class Calendar implements ActionListener {
     JComboBox status = null;
     JTextField latitude = null;
     JTextField longitude = null;
-    // @author: Ming
+    //@author: Ming
     JComboBox cb = null;
 
-  /*
-   * @author Kalen I added in this boolean to use to test whether or not the user is adding geographic coordinates. I
-   * also added a second boolean to test whether or not the user made a error in entering the geographic coordinates.
-   *
-   * boolean useGeo = false; boolean geoError = false;
-   */
+    /*@author Kalen
+     * I added in this boolean to use to test whether or not the user is adding geographic coordinates. I also added a second boolean to test whether or not
+     * the user made a error in entering the geographic coordinates.
+     *
+    boolean useGeo = false;
+    boolean geoError = false;
+    */
 
     /* Buttons */
     JButton submit = null;
@@ -70,21 +78,22 @@ public class Calendar implements ActionListener {
 
     /* Constructor */
     public Calendar() {
-    /* Create the text fields */
+        /* Create the text fields */
         eventTitle = new JTextField("Untitled Event");
         dateTimeStart = new JTextField(dateFormat.format(date));
         dateTimeEnd = new JTextField(dateFormat.format(date));
-        location = new JTextField("University of Hawaii at Manoa, 2500 Campus Rd, " + "Honolulu, HI 96822, United States");
+        location = new JTextField("University of Hawaii at Manoa, 2500 Campus Rd, " +
+                "Honolulu, HI 96822, United States");
         description = new JTextField("");
-        String[] statuses = {"TENTATIVE", "CONFIRMED", "CANCELLED"};
+        String[] statuses = {"TENTATIVE","CONFIRMED","CANCELLED"};
         status = new JComboBox(statuses);
         latitude = new JTextField("");
         longitude = new JTextField("");
-        // @author: Ming
-        String[] choices = {"PUBLIC", "PRIVATE", "CONFIDENTIAL"};
+        //@author: Ming
+        String[] choices = { "PUBLIC","PRIVATE", "CONFIDENTIAL"};
         cb = new JComboBox(choices);
 
-    /* Create the buttons with action listeners on these objects */
+        /* Create the buttons with action listeners on these objects */
         submit = new JButton("Submit");
         submit.addActionListener(this);
         newFileName = new JTextField("");///k
@@ -95,22 +104,22 @@ public class Calendar implements ActionListener {
         quit = new JButton("Quit");
         quit.addActionListener(this);
 
-    /* Create a panel implemented in the Panel class at the bottom. */
+        /* Create a panel implemented in the Panel class at the bottom. */
         panel = new Panel();
 
-    /* Create a Swing frame */
+        /* Create a Swing frame */
         frame = new JFrame();
 
-    /* Setting a simple layout for the frame */
+        /* Setting a simple layout for the frame*/
         frame.setLayout(new GridLayout(0, 2));
 
-    /* Verifying the fields */
+        /* Verifying the fields */
         eventTitle.setInputVerifier(stringVerifier);
         latitude.setInputVerifier(numVerifier);
         longitude.setInputVerifier(numVerifier);
 
-    /* Add all the above widgets to the frame, one after the other */
-        // text fields
+        /* Add all the above widgets to the frame, one after the other */
+        //text fields
         frame.add(new JLabel("Event Title: "));
         frame.add(eventTitle);
         frame.add(new JLabel("From: "));
@@ -127,38 +136,37 @@ public class Calendar implements ActionListener {
         frame.add(description);
         frame.add(new JLabel("Status: "));
         frame.add(status);
-        // @author: Ming
+        //@author: Ming
         frame.add(new JLabel("Classification"));
         frame.add(cb);
 
-        // buttons
+        //buttons
         frame.add(importICS);
         frame.add(calculate);
         frame.add(submit);
         frame.add(newFileName);///k
         frame.add(quit);
 
-    /* Pack then render the frame */
+        /* Pack then render the frame */
         frame.pack();
         frame.setVisible(true);
     }
-
 
     public static void main(String[] args) {
         new Calendar();
     }
 
 
-    /* Method to convert hours to Google calendar .ics file format ?GMT?(w/e timezone) = 10+ HST */
-    public int hourConversion(int hour) {
-        if (hour < 14) {
-            hour += 10; // if am += 10
-        } else {
+    /* Method to convert hours to Google calendar .ics file format ?GMT?(w/e timezone) = 10+ HST*/
+    public int hourConversion(int hour){
+        if(hour < 14){
+            hour += 10;  // if am += 10
+        }
+        else{
             hour -= 14; // if pm -= 14, essentially +10 -24. Ex: 3pm = 15pm + 10 = 25pm - 24 = 1pm
         }
         return hour;
     }
-
 
     @Override
     public void actionPerformed(ActionEvent event) {
@@ -175,7 +183,7 @@ public class Calendar implements ActionListener {
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             dateFormat2.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-            // Submitting process begin:
+            //Submitting process begin:
 
             try {
                 // For DTSTART
@@ -211,72 +219,84 @@ public class Calendar implements ActionListener {
                 String submitSecond = dateFormat2.format(date2).substring(17, 19);
 
                 // Variables to be written into .ics file
-                String startText = "BEGIN:VCALENDAR\nPRODID:-//Google Inc//Google Calendar_knb 70.9054//EN\n"
-                        + "VERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n" + "X-WR-CALNAME:symn@hawaii.edu\n" + // need to fix so
-                        // it takes the
-                        // user's email
-                        // instead
+                String startText = "BEGIN:VCALENDAR\nPRODID:-//Google Inc//Google Calendar 70.9054//EN\n" +
+                        "VERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n" +
+                        "X-WR-CALNAME:symn@hawaii.edu\n" + //need to fix so it takes the user's email instead
                         "X-WR-TIMEZONE:Pacific/Honolulu\nBEGIN:VEVENT\n";
 
-                String DTSTART = startYear + startMonth + startDay + "T" + startHour + startMinute + "00Z";
+                String DTSTART = startYear + startMonth + startDay + "T" +
+                        startHour + startMinute + "00Z";
 
-                String DTEND = endYear + endMonth + endDay + "T" + endHour + endMinute + "00Z";
+                String DTEND = endYear + endMonth + endDay + "T" +
+                        endHour + endMinute + "00Z";
 
-                String DTSTAMP =
-                        currentYear + currentMonth + currentDay + "T" + currentHour + currentMinute + currentSecond + "Z";
+                String DTSTAMP = currentYear + currentMonth + currentDay + "T" +
+                        currentHour + currentMinute + currentSecond + "Z";
 
-                // ***fix this, don't know what it is***
+                //***fix this, don't know what it is***
                 String UID = "rp6v6nppa2nm9gqfh1ais4k3mo@google.com";
 
-                String CREATED = submitYear + submitMonth + submitDay + "T" + submitHour + submitMinute + submitSecond + "Z";
+                String CREATED = submitYear + submitMonth + submitDay + "T" +
+                        submitHour + submitMinute + submitSecond + "Z";
 
                 String DESCRIPTION = this.description.getText();
 
-                String LASTMODIFIED =
-                        submitYear + submitMonth + submitDay + "T" + submitHour + submitMinute + submitSecond + "Z";
+                String LASTMODIFIED = submitYear + submitMonth + submitDay + "T" +
+                        submitHour + submitMinute + submitSecond + "Z";
 
                 String LOCATION = location.getText().replaceAll(",", "\\\\,");
-
-                // @author: Ming
-                // Getting choice of CLASSIFICATION
+                
+                //@author: Ming
+                //Getting choice of CLASSIFICATION
                 String choice = (String) cb.getSelectedItem();
 
-                // ***should be zero. Sequence is incremented when changes are made to a existing event in iCal application.***
+                //***should be zero. Sequence is incremented when changes are made to a existing event in iCal application.***
                 String SEQUENCE = "0";
 
-        /*
-         * @author Kalen Status is used for group events to indicate whether the event is Confirmed (definitely
-         * happening), tentative (might not happen), or cancelled (not happening).
-         */
+                /* @author Kalen
+                 * Status is used for group events to indicate whether the event is Confirmed (definitely happening), tentative (might not happen), or
+                 * cancelled (not happening).
+                 */
                 String STATUS = (String) status.getSelectedItem();
-
-        /*
-         * Note:this is the old thing for status. I'm leaving it here in case I want to see it again. if
-         * (!(STATUS.equalsIgnoreCase("Tentative") || STATUS.equalsIgnoreCase("Confirmed") ||
-         * STATUS.equalsIgnoreCase("Cancelled"))) { throw new InvalidAttributeValueException("wrong"); } STATUS =
-         * STATUS.toUpperCase();
-         */
-
-        /*
-         * @author Kalen This block of code is for my implementation of the geographic coordinate thing. First it gets
-         * the text from the latitude and longitude input. It checks whether or not the length of either is 0, which
-         * means the user didn't enter anything, and sets a the boolean useGeo accordingly. This boolean is used to
-         * determine whether or not the code for adding the geo coordinates will be used. If the user did enter
-         * something, it tests to see whether or not it is valid input and sets another boolean, geoError, accordingly.
-         * If the input was invalid, the block catches it, sets the geoError boolean to true, and throws another
-         * exception to be caught by the main catch block for the program.
-         *
-         * String lat = latitude.getText(); String lon = longitude.getText(); Float latAsFloat = null; Float lonAsFloat
-         * = null; if (lat.length() > 0 && lon.length() > 0) { useGeo = true; } if (useGeo) { try { latAsFloat =
-         * Float.valueOf(lat); lonAsFloat = Float.valueOf(lon); } catch (NumberFormatException e) { geoError = true;
-         * throw new NumberFormatException(""); } }
-         */
+                
+                /* Note:this is the old thing for status. I'm leaving it here in case I want to see it again.
+                if (!(STATUS.equalsIgnoreCase("Tentative") || STATUS.equalsIgnoreCase("Confirmed") || STATUS.equalsIgnoreCase("Cancelled"))) {
+                	throw new InvalidAttributeValueException("wrong");
+                }
+                STATUS = STATUS.toUpperCase();
+                */
+                
+                
+                /*@author Kalen
+                 * This block of code is for my implementation of the geographic coordinate thing. First it gets the text from the latitude and longitude
+                 * input. It checks whether or not the length of either is 0, which means the user didn't enter anything, and sets a the boolean useGeo
+                 * accordingly. This boolean is used to determine whether or not the code for adding the geo coordinates will be used. If the user did enter
+                 * something, it tests to see whether or not it is valid input and sets another boolean, geoError, accordingly. If the input was invalid, the 
+                 * block catches it, sets the geoError boolean to true, and throws another exception to be caught by the main catch block for the program.
+                 *
                 String lat = latitude.getText();
                 String lon = longitude.getText();
-                Geo g = new Geo(lat, lon);
+                Float latAsFloat = null;
+                Float lonAsFloat = null;
+                if (lat.length() > 0 && lon.length() > 0) {
+                	useGeo = true;
+                }
+                if (useGeo) {
+					try {
+						latAsFloat = Float.valueOf(lat);
+						lonAsFloat = Float.valueOf(lon);
+					} catch (NumberFormatException e) {
+						geoError = true;
+						throw new NumberFormatException("");
+					}
+				}*/
+                String lat = latitude.getText();
+                String lon = longitude.getText();
+                Geo g = new Geo(lat,lon);
                 String coordinates = g.makeCoordinates();
-
-                String SUMMARY = this.eventTitle.getText();
+                
+                
+				String SUMMARY = this.eventTitle.getText();
 
                 PrintWriter writer = null;
                 try {
@@ -291,23 +311,26 @@ public class Calendar implements ActionListener {
                     writer.println("DESCRIPTION:" + DESCRIPTION);
                     writer.println("LAST-MODIFIED:" + LASTMODIFIED);
                     writer.println("LOCATION:" + LOCATION);
-
-          /*
-           * @author: Kalen if user entered in valid coordinates, then the program will write the geo coordinate data.
-           * If the user didn't input anything, it won't be used.
-           *
-           * if (geoError == false && useGeo == true) { writer.println("GEO:" + lat + ";" + lon); }
-           */
+                    
+                    /*@author: Kalen
+                     * if user entered in valid coordinates, then the program will write the geo coordinate data. If the user didn't input anything,
+                     * it won't be used.
+                     *
+                    if (geoError == false && useGeo == true) {
+                    	writer.println("GEO:" + lat + ";" + lon);
+                    }*/
                     if (coordinates != null) {
-                        writer.println(coordinates);
+                    	writer.println(coordinates);
                     }
-
-                    // @author: Ming
-                    writer.println("CLASS:" + choice); // Adding CLASS (classification) to the .ics
+                    
+                    //@author: Ming
+                    writer.println("CLASS:" + choice); //Adding CLASS (classification) to the .ics
                     writer.println("SEQUENCE:" + SEQUENCE);
                     writer.println("STATUS:" + STATUS);
                     writer.println("SUMMARY:" + SUMMARY);
-                    writer.println("TRANSP:OPAQUE\n" + "END:VEVENT\n" + "END:VCALENDAR");
+                    writer.println("TRANSP:OPAQUE\n" +
+                            "END:VEVENT\n" +
+                            "END:VCALENDAR");
                     writer.close();
                     System.out.println("Submitted.");
                 } catch (Exception e) {
@@ -316,137 +339,121 @@ public class Calendar implements ActionListener {
                 }
             } catch (Exception e) {
                 System.out.println("Reading text field error");
-
-        /*
-         * @author Kalen If the user inputted something that was invalid, the geo coordinate code block will set
-         * geoError to true, so the user knows that was the source of the error.
-         *
-         * if (geoError == true) { System.out.println("Not valid geographic coordinates"); }
-         */
+                
+                /*@author Kalen
+                 * If the user inputted something that was invalid, the geo coordinate code block will set geoError to true, so the user knows that was
+                 * the source of the error.
+                 *
+                if (geoError == true) {
+                	System.out.println("Not valid geographic coordinates");
+                }*/
             }
-        } else if (event.getSource() == this.importICS) {
+        }
+        else if (event.getSource() == this.importICS) {
             // If the import button is clicked, then...
-            JFileChooser importFile = new JFileChooser();
-            int value = importFile.showOpenDialog(this.frame);
-            if (value == JFileChooser.APPROVE_OPTION) {
-                String path = importFile.getSelectedFile().getAbsolutePath();
-                if (!importFile.getSelectedFile().getName().endsWith(".ics")) {
-                    JOptionPane.showMessageDialog(null, "must be .ics file");
-                }
+        	JFileChooser importFile = new JFileChooser();
+            importFile.showOpenDialog(null);
+        	String path = importFile.getSelectedFile().getAbsolutePath();
+        	//Kalen addition
+        	String chosenFile = importFile.getSelectedFile().getName();
+        	System.out.println(chosenFile);
+      		try {
+        		BufferedReader br = new BufferedReader(new FileReader(path));
+        		if(br.ready()){
+                    StringBuilder sb = new StringBuilder();
+                    String line = br.readLine();
+                    String title = "SUMMARY";
+                    String date = "DTSTART";
+                    String geo = "GEO";
+                    String userICS = "", userTitle = "", userDate = "", userLatitude = "", userLongitude = "";
 
-                try {
-                    BufferedReader br = new BufferedReader(new FileReader(path));
-                    if (br.ready()) {
-                        StringBuilder sb = new StringBuilder();
-                        String line = br.readLine();
-                        String title = "SUMMARY";
-                        String dateStart = "DTSTART";
-                        String dateEnd = "DTEND";
-                        String geo = "GEO";
-                        String userICS = "", userTitle = "", userSDate = "", userEDate = "", userLatitude = "", userLongitude = "";
-
-                        while (line != null) {
-                            sb.append(line);
-                            sb.append("\n");
-                            if (line.contains(title)) {
-                                userTitle = line.substring(8, line.length());
-                                // System.out.println(userTitle);
-                            }
-                            if (line.contains(dateStart)) {
-                                userSDate = line.substring(8, line.length());
-                                //System.out.println(userDate);
-                            }
-                            if (line.contains(dateEnd)) {
-                                userEDate = line.substring(6, line.length());
-                            }
-                            if (line.contains(geo)) {
-                                String[] coordinates = line.split(";");
-                                userLatitude = coordinates[0].substring(4);
-                                // System.out.println(userLatitude);
-                                userLongitude = coordinates[1];
-                                // System.out.println(userLongitude);
-                            }
-                            line = br.readLine();
+                    while (line != null) {
+                        sb.append(line);
+                        sb.append("\n");
+                        if(line.contains(title)){
+                            userTitle = line.substring(8, line.length());
+                            //System.out.println(userTitle);
                         }
-
-                        userICS = sb.toString();
-
-                        IcsEvent userEvent = new IcsEvent(userICS, userTitle, userSDate, userEDate, userLatitude, userLongitude);
-
-                        if (!(userSDate.equals(""))) {
-                            Events.add(userEvent);
-                            Collections.sort(Events, new Comparator<IcsEvent>() {
-                                @Override
-                                public int compare(IcsEvent e1, IcsEvent e2) {
-                                    return e1.getStartDate().compareTo(e2.getStartDate());
-                                }
-                            });
-                        } else {
-                            System.err.println("This file does not have a datetime specified");
+                        if(line.contains(date)){
+                            userDate = line.substring(8, line.length());
+                            //System.out.println(userDate);
                         }
-
-                        br.close();
-
-                        System.out.println("List of imported events sorted by datetime: ");
-
-
-                        for (IcsEvent Event : Events) {
-                            System.out.print("Event: \"" + Event.getTitle() + "\" ");
-
-                            String startTime = Event.getStartDate();
-                            String sTime = startTime.substring(4, 6) + "/" + startTime.substring(6, 8) + " " +
-                                    startTime.substring(9, 11) + ":" + startTime.substring(11, 13);
-
-                            String endTime = Event.getEndDate();
-                            String eTime = endTime.substring(4, 6) + "/" + endTime.substring(6, 8) + " " +
-                                    endTime.substring(9, 11) + ":" + endTime.substring(11, 13);
-
-                            System.out.print("occurs FROM " + sTime + " TO " + eTime + "\n");
-
+                        if(line.contains(geo)){
+                            String[] coordinates = line.split(";");
+                            userLatitude = coordinates[0].substring(4);
+                            //System.out.println(userLatitude);
+                            userLongitude = coordinates[1];
+                            //System.out.println(userLongitude);
                         }
-                        System.out.println();
+                        line = br.readLine();
                     }
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-      /*else if(value == JFileChooser.CANCEL_OPTION){
-        JOptionPane.showMessageDialog(null, "You did not select any files");
-      }*/
 
-        } else if (event.getSource() == this.calculate) {
+                    userICS = sb.toString();
+                    IcsEvent userEvent = new IcsEvent(userICS, userTitle, userDate, userLatitude, userLongitude, chosenFile);
+
+                    if(!(userDate.equals(""))){
+                        Events.add(userEvent);
+                        Collections.sort(Events, new Comparator<IcsEvent>() {
+                            @Override
+                            public int compare(IcsEvent e1, IcsEvent e2) {
+                                return e1.getDate().compareTo(e2.getDate());
+                            }
+                        });
+                    }
+                    else{
+                        System.err.println("This file does not have a datetime specified");
+                    }
+
+                    br.close();
+
+                    System.out.println("List of imported events sorted by datetime: ");
+                    for (IcsEvent Event : Events) {
+                        System.out.println(Event.getTitle());
+                    }
+        		}
+      		}
+      		catch (FileNotFoundException e) {
+        		e.printStackTrace();
+      		}
+      		catch (IOException e) {
+		 	    e.printStackTrace();
+      		}
+
+
+        }
+        else if (event.getSource() == this.calculate) {
             String gcd = "";
-            if (Events.size() > 1) {
+            if(Events.size() > 1){
                 System.out.println("Calculating Great Circle Distances");
                 for (int i = 1; i < Events.size() + 1; i++) {
                     IcsEvent e1 = Events.get(i - 1);
 
-                    if (i == Events.size()) {
-                        gcd = "COMMENT:Great Circle Distance cannot be calculated because this event does not"
-                                + " have any events following it (for the date specified) ";
-                    } else {
+
+                    if(i == Events.size()){
+                        gcd = "COMMENT:Great Circle Distance cannot be calculated because this event does not" +
+                                " have any events following it (for the date specified) ";
+                    }
+                    else {
                         IcsEvent e2 = Events.get(i);
                         if (!(e1.getLatitude().equals("") || e1.getLongitude().equals(""))) {
                             if (!(e2.getLatitude().equals("") || e2.getLongitude().equals(""))) {
 
-                /* This code is from: http://introcs.cs.princeton.edu/java/12types/GreatCircle.java.html */
+                                /* This code is from: http://introcs.cs.princeton.edu/java/12types/GreatCircle.java.html */
                                 double x1 = Math.toRadians(Double.parseDouble(e1.getLatitude()));
                                 double y1 = Math.toRadians(Double.parseDouble(e1.getLongitude()));
                                 double x2 = Math.toRadians(Double.parseDouble(e2.getLatitude()));
                                 double y2 = Math.toRadians(Double.parseDouble(e2.getLongitude()));
 
                                 // great circle distance in radians
-                                double angle1 =
-                                        Math.acos(Math.sin(x1) * Math.sin(x2) + Math.cos(x1) * Math.cos(x2) * Math.cos(y1 - y2));
+                                double angle1 = Math.acos(Math.sin(x1) * Math.sin(x2)
+                                        + Math.cos(x1) * Math.cos(x2) * Math.cos(y1 - y2));
 
                                 // convert back to degrees
                                 angle1 = Math.toDegrees(angle1);
 
                                 // each degree on a great circle of Earth is 60 nautical miles
                                 double distance = 60 * angle1;
-                /* end code */
+                                /* end code */
 
                                 // 1 nautical mile = 1.1508 statute miles
                                 double distance1 = distance * 1.1508;
@@ -454,19 +461,19 @@ public class Calendar implements ActionListener {
                                 // 1 nautical mile = 1.852 kilometers
                                 double distance2 = distance * 1.852;
 
-                                gcd = "COMMENT:Great Circle Distance to next upcoming event = " + distance1 + " statute miles or "
-                                        + distance2 + " kilometers.";
+                                gcd = "COMMENT:Great Circle Distance to next upcoming event = " + distance1
+                                        + " statute miles or " + distance2 + " kilometers.";
                             } else {
-                                gcd = "COMMENT:Great Circle Distance cannot be calculated because the"
-                                        + " event following this does not have a geographic position specified ";
+                                gcd = "COMMENT:Great Circle Distance cannot be calculated because the" +
+                                        " event following this does not have a geographic position specified ";
                             }
                         } else {
-                            gcd = "COMMENT:Great Circle Distance cannot be calculated because this"
-                                    + " event does not have a geographic position specified ";
+                            gcd = "COMMENT:Great Circle Distance cannot be calculated because this" +
+                                    " event does not have a geographic position specified ";
                         }
                     }
-                    // System.out.println(gcd);
-                    // System.out.println(Events.get(i).getDate());
+                    //System.out.println(gcd);
+                    //System.out.println(Events.get(i).getDate());
 
                     String[] icsParts = e1.getICS().split("LOCATION");
                     String part1 = icsParts[0];
@@ -474,17 +481,18 @@ public class Calendar implements ActionListener {
                     String combined = part1 + gcd + "\n" + "LOCATION" + part2;
                     PrintWriter writer = null;
                     try {
-                        writer = new PrintWriter(e1.getTitle() + ".ics");
+                        writer = new PrintWriter(e1.getFileName());
                         writer.print(combined);
                         writer.close();
-                        System.out.println(
-                                "File: " + e1.getTitle() + ".ics has been modified to" + " include Great Circle Distance in a COMMENT");
+                        System.out.println("File: " + e1.getTitle() + ".ics has been modified to" +
+                                " include Great Circle Distance in a COMMENT");
                     } catch (Exception e) {
-                        System.out.println("Error!");
-                        e.printStackTrace();
+                    System.out.println("Error!");
+                    e.printStackTrace();
                     }
-                } // end for loop that cycles through events
-            } else {
+                }//end for loop that cycles through events
+            }
+            else{
                 System.err.println("Not enough .ics events were imported.");
                 System.err.println("At least 2 events are required to compute a Great Circle Distance");
             }
@@ -492,9 +500,8 @@ public class Calendar implements ActionListener {
     }
 
     private class Panel extends JPanel {
-        static final int PANEL_WIDTH = 500; // width of the panel in pixels
-        static final int PANEL_HEIGHT = 500; // height of the panel in pixels
-
+        static final int PANEL_WIDTH = 500;     // width of the panel in pixels
+        static final int PANEL_HEIGHT = 500;    // height of the panel in pixels
 
         /* Constructor */
         public Panel() {
