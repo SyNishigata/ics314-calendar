@@ -387,79 +387,79 @@ public class Calendar implements ActionListener {
 			email.setText("");
         }
         else if (event.getSource() == this.importICS) {
-            // If the import button is clicked, then...
-        	JFileChooser importFile = new JFileChooser();
-            importFile.showOpenDialog(null);
-        	String path = importFile.getSelectedFile().getAbsolutePath();
-        	//Kalen addition
-        	String chosenFile = importFile.getSelectedFile().getName();
-        	System.out.println(chosenFile);
-      		try {
-        		BufferedReader br = new BufferedReader(new FileReader(path));
-        		if(br.ready()){
-                    StringBuilder sb = new StringBuilder();
-                    String line = br.readLine();
-                    String title = "SUMMARY";
-                    String date = "DTSTART";
-                    String geo = "GEO";
-                    String userICS = "", userTitle = "", userDate = "", userLatitude = "", userLongitude = "";
+          // If the import button is clicked, then...
+          JFileChooser importFile = new JFileChooser();
+          int value = importFile.showOpenDialog(this.frame);
+          if (value == JFileChooser.APPROVE_OPTION) {
+            String path = importFile.getSelectedFile().getAbsolutePath();
 
-                    while (line != null) {
-                        sb.append(line);
-                        sb.append("\n");
-                        if(line.contains(title)){
-                            userTitle = line.substring(8, line.length());
-                            //System.out.println(userTitle);
-                        }
-                        if(line.contains(date)){
-                            userDate = line.substring(8, line.length());
-                            String utcHour = userDate.substring(userDate.length() - 7, userDate.length() - 5);
-                            Integer utcHourAsInteger = Integer.parseInt(utcHour);
-                            //System.out.println(userDate);
-                        }
-                        if(line.contains(geo)){
-                            String[] coordinates = line.split(";");
-                            userLatitude = coordinates[0].substring(4);
-                            //System.out.println(userLatitude);
-                            userLongitude = coordinates[1];
-                            //System.out.println(userLongitude);
-                        }
-                        line = br.readLine();
+            try {
+              BufferedReader br = new BufferedReader(new FileReader(path));
+              if (br.ready()) {
+                StringBuilder sb = new StringBuilder();
+                String line = br.readLine();
+                String title = "SUMMARY";
+                String date = "DTSTART";
+                String geo = "GEO";
+                String userICS = "", userTitle = "", userDate = "", userLatitude = "", userLongitude = "";
+
+                while (line != null) {
+                  sb.append(line);
+                  sb.append("\n");
+                  if (line.contains(title)) {
+                    userTitle = line.substring(8, line.length());
+                    // System.out.println(userTitle);
+                  }
+                  if (line.contains(date)) {
+                    userDate = line.substring(8, line.length());
+                    // System.out.println(userDate);
+                  }
+                  if (line.contains(geo)) {
+                    String[] coordinates = line.split(";");
+                    userLatitude = coordinates[0].substring(4);
+                    // System.out.println(userLatitude);
+                    userLongitude = coordinates[1];
+                    // System.out.println(userLongitude);
+                  }
+                  line = br.readLine();
+                }
+
+                userICS = sb.toString();
+                IcsEvent userEvent = new IcsEvent(userICS, userTitle, userDate, userLatitude, userLongitude, path);
+
+                if (!(userDate.equals(""))) {
+                  Events.add(userEvent);
+                  Collections.sort(Events, new Comparator<IcsEvent>() {
+                    @Override
+                    public int compare(IcsEvent e1, IcsEvent e2) {
+                      return e1.getDate().compareTo(e2.getDate());
                     }
+                  });
+                }
+                else {
+                  System.err.println("This file does not have a datetime specified");
+                }
 
-                    userICS = sb.toString();
-                    IcsEvent userEvent = new IcsEvent(userICS, userTitle, userDate, userLatitude, userLongitude, chosenFile);
-                    
+                br.close();
 
-                    if(!(userDate.equals(""))){
-                        Events.add(userEvent);
-                        Collections.sort(Events, new Comparator<IcsEvent>() {
-                            @Override
-                            public int compare(IcsEvent e1, IcsEvent e2) {
-                                return e1.getDate().compareTo(e2.getDate());
-                            }
-                        });
-                    }
-                    else{
-                        System.err.println("This file does not have a datetime specified");
-                    }
+                System.out.println("List of imported events sorted by datetime: ");
+                for (IcsEvent Event : Events) {
+                  System.out.println(Event.getTitle());
+                }
+              }
+            }
+            catch (FileNotFoundException e) {
+              e.printStackTrace();
+            }
+            catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+          /*else if(value == JFileChooser.CANCEL_OPTION){
+            JOptionPane.showMessageDialog(null, "You did not select any files");
+          }*/
 
-                    br.close();
-
-                    System.out.println("List of imported events sorted by datetime: ");
-                    for (IcsEvent Event : Events) {
-                        System.out.println(Event.getTitle());
-                    }
-        		}
-      		}
-      		catch (FileNotFoundException e) {
-        		e.printStackTrace();
-      		}
-      		catch (IOException e) {
-		 	    e.printStackTrace();
-      		}
-
-
+        
         }
         else if (event.getSource() == this.calculate) {
             String gcd = "";
