@@ -56,6 +56,8 @@ public class Calendar implements ActionListener {
     JTextField longitude = null;
     //@author: Ming
     JComboBox cb = null;
+    //add on to try implement tzid
+    JComboBox timeZones = null;
 
     /*@author Kalen
      * I added in this boolean to use to test whether or not the user is adding geographic coordinates. I also added a second boolean to test whether or not
@@ -94,6 +96,8 @@ public class Calendar implements ActionListener {
         //@author: Ming
         String[] choices = { "PUBLIC","PRIVATE", "CONFIDENTIAL"};
         cb = new JComboBox(choices);
+        String[] tZones = {"US/Hawaii","US/Alaska","US/Pacific","US/Mountain","US/Central","US/Eastern"};
+        timeZones = new JComboBox(tZones);
 
         /* Create the buttons with action listeners on these objects */
         submit = new JButton("Submit data entered into new file");
@@ -126,6 +130,8 @@ public class Calendar implements ActionListener {
         frame.add(email);
         frame.add(new JLabel("Event Title: "));
         frame.add(eventTitle);
+        frame.add(new JLabel("Time zone (US only): "));
+        frame.add(timeZones);
         frame.add(new JLabel("From: "));
         frame.add(dateTimeStart);
         frame.add(new JLabel("To: "));
@@ -248,7 +254,7 @@ public class Calendar implements ActionListener {
                         startHour + startMinute + "00Z";
 
                 String DTEND = endYear + endMonth + endDay + "T" +
-                        endHour + endMinute + "00Z";
+                        endHour + endMinute + "00";
 
                 String DTSTAMP = currentYear + currentMonth + currentDay + "T" +
                         currentHour + currentMinute + currentSecond + "Z";
@@ -277,6 +283,8 @@ public class Calendar implements ActionListener {
                 //@author: Ming
                 //Getting choice of CLASSIFICATION
                 String choice = (String) cb.getSelectedItem();
+                
+                String timeZone = (String) timeZones.getSelectedItem();
 
                 //***should be zero. Sequence is incremented when changes are made to a existing event in iCal application.***
                 String SEQUENCE = "0";
@@ -330,8 +338,8 @@ public class Calendar implements ActionListener {
                 try {
                     writer = new PrintWriter(s);///k
                     writer.print(startText);
-                    writer.println("DTSTART:" + DTSTART);
-                    writer.println("DTEND:" + DTEND);
+                    writer.println("DTSTART;TZID=" + timeZone + ":" + DTSTART);
+                    writer.println("DTEND;TZID=" + timeZone + ":" + DTEND);
                     writer.println("DTSTAMP:" + DTSTAMP);
                     writer.println("UID:" + UID);
                     writer.println("CREATED:" + CREATED);
@@ -405,6 +413,8 @@ public class Calendar implements ActionListener {
                         }
                         if(line.contains(date)){
                             userDate = line.substring(8, line.length());
+                            String utcHour = userDate.substring(userDate.length() - 7, userDate.length() - 5);
+                            Integer utcHourAsInteger = Integer.parseInt(utcHour);
                             //System.out.println(userDate);
                         }
                         if(line.contains(geo)){
@@ -419,6 +429,7 @@ public class Calendar implements ActionListener {
 
                     userICS = sb.toString();
                     IcsEvent userEvent = new IcsEvent(userICS, userTitle, userDate, userLatitude, userLongitude, chosenFile);
+                    
 
                     if(!(userDate.equals(""))){
                         Events.add(userEvent);
