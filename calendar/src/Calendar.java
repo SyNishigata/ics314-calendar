@@ -227,6 +227,7 @@ public class Calendar implements ActionListener {
                 String submitHour = dateFormat2.format(date2).substring(11, 13);
                 String submitMinute = dateFormat2.format(date2).substring(14, 16);
                 String submitSecond = dateFormat2.format(date2).substring(17, 19);
+
                 
                 /*
                  * implementation for version. According to my research, .ics files correspond to version 2, and .vcs files correspond to version 1, so depending
@@ -283,7 +284,7 @@ public class Calendar implements ActionListener {
                 //@author: Ming
                 //Getting choice of CLASSIFICATION
                 String choice = (String) cb.getSelectedItem();
-                
+
                 String timeZone = (String) timeZones.getSelectedItem();
 
                 //***should be zero. Sequence is incremented when changes are made to a existing event in iCal application.***

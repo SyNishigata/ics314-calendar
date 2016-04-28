@@ -14,6 +14,7 @@ CREATED:20160408T114818Z
 DESCRIPTION:
 LAST-MODIFIED:20160408T114818Z
 COMMENT:Great Circle Distance cannot be calculated because this event does not have any events following it (for the date specified) 
+COMMENT:Great Circle Distance cannot be calculated because this event does not have any events following it (for the date specified) 
 LOCATION:7 Chome-3-1 Hongo\, Bunkyo\, Tokyo 113-8654\, Japan
 GEO:35.652832;139.83948
 CLASS:PUBLIC
