@@ -254,8 +254,6 @@ public class Calendar implements ActionListener {
                 String DTSTART = startYear + startMonth + startDay + "T" +
                         startHour + startMinute + "00Z";
 
-                System.out.println(DTSTART);
-
                 String DTEND = endYear + endMonth + endDay + "T" +
                         endHour + endMinute + "00";
 
@@ -341,9 +339,7 @@ public class Calendar implements ActionListener {
                 try {
                     writer = new PrintWriter(s);///k
                     writer.print(startText);
-                    System.out.println(DTSTART);
                     writer.println("DTSTART;TZID=" + timeZone + ":" + DTSTART);
-                    System.out.println(DTSTART);
                     writer.println("DTEND;TZID=" + timeZone + ":" + DTEND);
                     writer.println("DTSTAMP:" + DTSTAMP);
                     writer.println("UID:" + UID);
